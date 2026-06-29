@@ -1,0 +1,22 @@
+# Session State Explorer v0 — runtime dependencies
+# Core pipeline (required)
+streamlit>=1.30
+networkx>=3.1
+pandas>=2.0
+numpy>=1.24
+pydantic>=2.5
+
+# Graph visualization (PyVis primary; Plotly is the automatic fallback)
+pyvis>=0.3.2
+plotly>=5.18
+
+# Audio descriptor extraction (librosa default)
+librosa>=0.10
+soundfile>=0.12
+
+# Optional: integrated-loudness approximation (LUFS).
+# The app degrades gracefully if this is absent.
+pyloudnorm>=0.1.1
+
+# NOTE: Essentia is intentionally NOT listed here. It is an optional accelerator only.
+# See src/session_state_explorer/essentia_adapter.py for the graceful fallback.

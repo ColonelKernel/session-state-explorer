@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Generated demo audio (re-create with: python data/examples/make_example_data.py)
+data/examples/audio/*.wav
+data/examples/audio/*.aiff
+data/examples/audio/*.flac
+
+# Generated graph dumps / exports
+*.html
+*_export.json
+exports/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Streamlit
+.streamlit/secrets.toml

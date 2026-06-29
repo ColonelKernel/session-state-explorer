@@ -1,0 +1,246 @@
+<REAPER_PROJECT 0.1 "7.0/example" 1700000000
+  TEMPO 120 4 4
+  SAMPLERATE 44100 0 0
+  <TRACK {GUID-00}
+    NAME "Lead Vox"
+    PEAKCOL 16576
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Lead Vox take"
+      <SOURCE WAVE
+        FILE "audio/lead_vox.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-01}
+    NAME "BGV"
+    PEAKCOL 24768
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "BGV take"
+      <SOURCE WAVE
+        FILE "audio/bgv.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaVerbate (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-02}
+    NAME "Kick"
+    PEAKCOL 12615680
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Kick take"
+      <SOURCE WAVE
+        FILE "audio/kick.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaComp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-03}
+    NAME "Snare"
+    PEAKCOL 12623872
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Snare take"
+      <SOURCE WAVE
+        FILE "audio/snare.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaComp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "Plate Reverb" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-04}
+    NAME "Bass"
+    PEAKCOL 8388672
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Bass take"
+      <SOURCE WAVE
+        FILE "audio/bass.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaComp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-05}
+    NAME "Guitar"
+    PEAKCOL 32864
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Guitar take"
+      <SOURCE WAVE
+        FILE "audio/guitar.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaDelay (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-06}
+    NAME "Synth Pad"
+    PEAKCOL 4210880
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaComp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaVerbate (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaDelay (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "Tape Saturation" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "VST: ReaXcomp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "Stereo Width Utility" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-07}
+    NAME "Perc"
+    PEAKCOL 12607488
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <ITEM
+      POSITION 0
+      LENGTH 2.0
+      NAME "Perc take"
+      <SOURCE WAVE
+        FILE "audio/perc.wav"
+      >
+    >
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaEQ (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+      BYPASS 0 0 0
+      <VST "Room Reverb" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+  >
+  <TRACK {GUID-08}
+    NAME "Drum Bus"
+    PEAKCOL 6316128
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    <FXCHAIN
+      BYPASS 0 0 0
+      <VST "VST: ReaComp (Cockos)" plugin.dll 0 "" 0
+        ZmFrZWNodW5r
+      >
+      WAK 0 0
+    >
+    AUXRECV 2 0 1 0 0 0 0 0 0
+    AUXRECV 3 0 1 0 0 0 0 0 0
+    AUXRECV 7 0 1 0 0 0 0 0 0
+    AUXRECV 99 0 1 0 0 0 0 0 0
+  >
+>
