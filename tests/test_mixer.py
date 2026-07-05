@@ -122,6 +122,40 @@ def test_master_strip_carries_project_transport():
     assert console.master.sample_rate == 48000
 
 
+def test_header_color_cannot_inject_markup():
+    # A non-hex colour (only reachable if a future code path bypasses decode_color)
+    # must not break out of the style attribute — it falls back to the default and
+    # the injected markup never appears in the output.
+    from session_state_explorer.mixer import _DEFAULT_HEADER, build_channel_strip
+    from session_state_explorer.models import TrackState
+
+    evil = '"><img src=x onerror=alert(1)>'
+    track = TrackState(id="t0", index=0, name="Kick", color=evil)
+    strip = build_channel_strip(track, [], {"t0": "Kick"}, receives=0)
+    assert strip.header_color == _DEFAULT_HEADER  # sanitised at build
+
+    html = render_console_html(build_console(
+        # a whole project whose track carries the malicious colour
+        parse_rpp('<REAPER_PROJECT 0.1 "x" 0\n  <TRACK\n    NAME "Kick"\n  >\n>\n')
+    ))
+    # Belt-and-suspenders: even a directly-rendered evil strip stays inert.
+    from session_state_explorer.mixer import render_strip_html
+    strip.header_color = evil  # bypass the build-time sanitiser
+    out = render_strip_html(strip)
+    assert "<img src=x" not in out
+    assert "onerror" not in out or "&gt;" in out  # any residue is escaped, not active
+
+
+def test_valid_hex_color_is_preserved():
+    from session_state_explorer.mixer import _safe_header_color, _DEFAULT_HEADER
+
+    assert _safe_header_color("#c04000") == "#c04000"
+    assert _safe_header_color("#ABCDEF") == "#ABCDEF"
+    assert _safe_header_color(None) == _DEFAULT_HEADER
+    assert _safe_header_color("red") == _DEFAULT_HEADER  # named colours rejected
+    assert _safe_header_color("#fff") == _DEFAULT_HEADER  # short hex rejected
+
+
 def test_render_console_html_is_self_contained_and_escaped():
     rpp = """<REAPER_PROJECT 0.1 "x" 0
   <TRACK

@@ -13,6 +13,7 @@ role, FX family/enabled/offline in chain order, and routes with send mode/level/
 from __future__ import annotations
 
 import html
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -63,6 +64,21 @@ FAMILY_COLORS: Dict[str, str] = {
 }
 _DEFAULT_CHIP = "#8c8c8c"
 _DEFAULT_HEADER = "#3a3f4b"  # neutral header when a track has no custom colour
+_HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _safe_header_color(value: Optional[str]) -> str:
+    """Return ``value`` only if it is a plain ``#rrggbb`` string, else the default.
+
+    ``header_color`` is the one field interpolated into a style attribute, so it must
+    never carry attacker-controlled markup. Today ``decode_color`` only ever yields
+    ``#rrggbb`` or ``None``, but this view-model accepts any ``TrackState`` (``color``
+    is typed ``Optional[str]``), so we validate at the choke point rather than trust it.
+    """
+
+    if value and _HEX_COLOR_RE.match(value):
+        return value
+    return _DEFAULT_HEADER
 
 
 # ---------------------------------------------------------------------------
@@ -218,7 +234,7 @@ def build_channel_strip(
         track_id=track.id,
         index=track.index,
         name=track.name or f"Track {track.index + 1}",
-        header_color=track.color or _DEFAULT_HEADER,
+        header_color=_safe_header_color(track.color),
         roles=_roles_for(track, receives),
         volume_db_label=format_db(track.volume_db),
         pan_label=format_pan(track.pan),
@@ -352,9 +368,12 @@ def render_strip_html(strip: ChannelStrip) -> str:
         else '<div class="sse-muted-note">no sends</div>'
     )
     recv = f' · {strip.receives} in' if strip.receives else ""
+    # header_color is sanitised at build time, but escape here too so a
+    # directly-constructed strip can never break out of the style attribute.
+    header_color = html.escape(strip.header_color, quote=True)
     return (
         '<div class="sse-strip">'
-        f'<div class="sse-strip__hd" style="background:{strip.header_color}" '
+        f'<div class="sse-strip__hd" style="background:{header_color}" '
         f'title="{html.escape(strip.name)}">{html.escape(strip.name)}</div>'
         '<div class="sse-strip__body">'
         f'<div class="sse-roles">{roles}</div>'
