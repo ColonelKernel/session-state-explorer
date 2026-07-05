@@ -185,6 +185,29 @@ rule.”_
 }
 ```
 
+### Canonical snapshot bundles (`sse-reaper export-canonical`)
+
+This repo is also the REAPER **observation instrument** for the cross-DAW
+Session State Analyzer ("four observation instruments, one analysis
+contract"). The `session_state_explorer.canonical_export` subpackage emits the
+shared v0.2 wire format:
+
+```bash
+# The contract package is not on PyPI; install it from the analyzer repo first:
+pip install -e <SessionStateExplorer>/packages/canonical_snapshot
+pip install -e .
+
+sse-reaper export-canonical data/examples/example_project.rpp --out exports/example_project
+```
+
+This writes a deterministic, sanitized 5-file bundle —
+`adapter_descriptor.json`, `capabilities.json`, `native.json` (the complete
+native `ProjectState`, the losslessness guarantee), `canonical.snapshot.json`
+(flat entities + relationships + provenance store, TRACK ≠ CHANNEL), and
+`validation.json` — with an honest capability manifest (plug-in internals
+INACCESSIBLE; automation/take FX/item fades/tempo map UNSUPPORTED; no
+write/live/render pathways).
+
 ## 11. Limitations
 
 - `.rpp` parsing is **partial** by design; it captures the accessible surface, not the full
