@@ -12,13 +12,20 @@ intermediate):
 - ``validation.json`` — the ``validate_snapshot`` report for the snapshot as
   written.
 
-Determinism: ids are reset per export, ``snapshot_id`` derives from the
-content hash of ``native.json``, and ``created_at`` derives from the source
-file's mtime — exporting the same file twice yields byte-identical bundles.
+Determinism: ids are reset per export and ``snapshot_id`` is content-addressed
+over the native model with the *containing* path normalised away, so the same
+``.rpp`` content produces the same ``snapshot_id`` regardless of where the file
+lives on disk or which machine ran the export. ``created_at`` defaults to the
+source file's mtime (overridable via the ``created_at`` argument): it is the one
+field that is not reproducible across a copy/checkout, since mtime is not
+preserved by ``cp``/``git``; pass an explicit value when regenerating a fixture
+that must be byte-identical.
 
-Sanitization (on by default): home-directory prefixes in path strings are
-replaced with ``"~"`` everywhere in the bundle, so a shared fixture never
-leaks a user name.
+Sanitization (on by default): home-directory prefixes in path strings —
+POSIX (``/Users/<u>``, ``/home/<u>``) and Windows (``<drive>:\\Users\\<u>``) —
+are replaced with ``"~"`` everywhere in the bundle, so a shared fixture never
+leaks a user name. Only a real home *root* is redacted; a nested ``…/Users/…``
+segment (e.g. a network mount) is left intact.
 """
 
 from __future__ import annotations
@@ -27,6 +34,7 @@ import hashlib
 import json
 import re
 from datetime import datetime, timezone
+from os.path import basename
 from pathlib import Path
 from typing import Any, Optional
 
@@ -41,6 +49,7 @@ from .manifest import (
     build_capability_manifest,
 )
 from .mapper import to_canonical
+from .native_models import ProjectState
 
 BUNDLE_FILES = (
     "adapter_descriptor.json",
@@ -50,12 +59,21 @@ BUNDLE_FILES = (
     "validation.json",
 )
 
-# Any POSIX home-directory prefix (not just the current user's): a bundle
-# sanitized on one machine must not leak collaborators' paths either.
-_HOME_PREFIX_RE = re.compile(r"(?:/Users|/home)/[^/\s\"']+")
+# Any home-directory root — POSIX (``/Users/<u>``, ``/home/<u>``) or Windows
+# (``<drive>:\Users\<u>``), any user, not just the current one — so a bundle
+# sanitised on one machine leaks neither our nor a collaborator's user name.
+# The leading negative lookbehind requires a path boundary before the root, so a
+# nested segment like ``/mnt/backups/Users/carol`` (Users under another dir) is
+# left intact instead of being corrupted.
+_HOME_PREFIX_RE = re.compile(
+    r"(?<![\w.\-:])([A-Za-z]:)?[\\/](?:Users|home)[\\/][^\\/\s\"']+",
+    re.IGNORECASE,
+)
 
 
 def _redact_homes(value: str) -> str:
+    # Current machine's actual home first (covers a non-standard $HOME), as a
+    # prefix only so a mid-string occurrence can't be mangled.
     home = str(Path.home())
     if home not in ("/", "") and value.startswith(home):
         value = "~" + value[len(home):]
@@ -92,8 +110,12 @@ def export_bundle(
     *,
     audio_base: Optional[Path] = None,
     sanitize: bool = True,
+    created_at: Optional[str] = None,
 ) -> dict[str, Any]:
     """Export one ``.rpp`` project as a canonical 5-file snapshot bundle.
+
+    ``created_at`` defaults to the source file's mtime; pass an explicit ISO-8601
+    string to make the bundle byte-reproducible (e.g. for fixture regeneration).
 
     Returns a small report: bundle file paths, the validation outcome, and
     entity/relationship counts. Raises :class:`FileNotFoundError` when
@@ -113,12 +135,28 @@ def export_bundle(
     text = rpp_path.read_text(encoding="utf-8", errors="replace")
     project = parse_rpp(text, source_file=str(rpp_path))
 
-    # -- native.json (sanitized first so the recorded hash matches the file) --
-    native_dict = project.model_dump()
+    # Sanitize ONCE at the source, before mapping: the contract derives some
+    # entity ids by slugging path strings (e.g. asset ids from audio paths), so
+    # redacting only the final JSON would still leak a user name inside those
+    # ids. Sanitizing the project up front makes native.json, the canonical
+    # entities, and every derived id consistent and clean.
     if sanitize:
-        native_dict = _sanitize(native_dict)
+        project = ProjectState.model_validate(_sanitize(project.model_dump()))
+
+    # -- native.json (the losslessness artifact) ---------------------------
+    native_dict = project.model_dump()
     native_bytes = _dump_json(native_dict)
+    # native_sha256 is the integrity hash of native.json exactly as written.
     native_sha256 = hashlib.sha256(native_bytes).hexdigest()
+
+    # snapshot_id is content-addressed but must be independent of *where* the
+    # .rpp lives: normalise the top-level source_file (the path the CLI was
+    # handed) to its basename so the same content at different absolute paths
+    # (or on different machines) yields the same id.
+    id_dict = dict(native_dict)
+    if id_dict.get("source_file"):
+        id_dict["source_file"] = basename(str(id_dict["source_file"]).replace("\\", "/"))
+    content_sha256 = hashlib.sha256(_dump_json(id_dict)).hexdigest()
 
     # -- nested intermediate -> flat v0.2 snapshot --------------------------
     session = to_canonical(project, source_artifact="rpp_file")
@@ -136,9 +174,10 @@ def export_bundle(
     capabilities = build_capability_manifest(
         daw_version=daw_version, adapter_version=ADAPTER_VERSION
     )
-    created_at = datetime.fromtimestamp(
-        rpp_path.stat().st_mtime, tz=timezone.utc
-    ).isoformat()
+    if created_at is None:
+        created_at = datetime.fromtimestamp(
+            rpp_path.stat().st_mtime, tz=timezone.utc
+        ).isoformat()
 
     snapshot = flatten_session(
         session,
@@ -146,7 +185,7 @@ def export_bundle(
         capabilities,
         native_file="native.json",
         native_sha256=native_sha256,
-        snapshot_id=f"reaper:rpp:{native_sha256[:16]}",
+        snapshot_id=f"reaper:rpp:{content_sha256[:16]}",
         created_at=created_at,
         default_stability="COMMUNITY_DOCUMENTED",
     )

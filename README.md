@@ -190,12 +190,20 @@ rule.”_
 This repo is also the REAPER **observation instrument** for the cross-DAW
 Session State Analyzer ("four observation instruments, one analysis
 contract"). The `session_state_explorer.canonical_export` subpackage emits the
-shared v0.2 wire format:
+shared v0.2 wire format.
+
+> **Optional feature.** The canonical adapter needs the `canonical-snapshot`
+> contract package, which is **not on PyPI** and is obtained separately (it
+> lives in the analyzer repo's `packages/canonical_snapshot`). The core
+> Streamlit app and `pip install -e .` do **not** require it, and CI skips the
+> canonical tests when it is absent — so this section only applies if you have
+> a local checkout of the contract package.
 
 ```bash
-# The contract package is not on PyPI; install it from the analyzer repo first:
-pip install -e <SessionStateExplorer>/packages/canonical_snapshot
-pip install -e .
+# 1. Install the contract package from your local analyzer checkout (editable):
+pip install -e /path/to/analyzer/packages/canonical_snapshot
+# 2. Install this repo with the canonical extra:
+pip install -e ".[canonical]"
 
 sse-reaper export-canonical data/examples/example_project.rpp --out exports/example_project
 ```

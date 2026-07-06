@@ -20,9 +20,16 @@ from pathlib import Path
 
 import pytest
 
-from canonical_snapshot.nested import NativePayload
-from session_state_explorer.canonical_export.mapper import to_canonical, to_native
-from session_state_explorer.rpp_parser import parse_rpp
+# The canonical-export feature needs the (non-PyPI) contract package; skip this
+# whole module cleanly when it is absent so the rest of the suite still runs.
+pytest.importorskip("canonical_snapshot")
+
+from canonical_snapshot.nested import NativePayload  # noqa: E402
+from session_state_explorer.canonical_export.mapper import (  # noqa: E402
+    to_canonical,
+    to_native,
+)
+from session_state_explorer.rpp_parser import parse_rpp  # noqa: E402
 
 EXAMPLE_RPP = (
     Path(__file__).resolve().parents[1]

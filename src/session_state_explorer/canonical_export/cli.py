@@ -68,6 +68,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         except FileNotFoundError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
+        except OSError as exc:
+            # e.g. --out is unwritable (PermissionError) or points at an
+            # existing file (FileExistsError/NotADirectoryError).
+            print(f"error: could not write bundle: {exc}", file=sys.stderr)
+            return 2
 
         stats = result["stats"]
         print(f"bundle:      {result['bundle_dir']}")
